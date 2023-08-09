@@ -19,13 +19,10 @@ app.use(methodOverride('_method'))// override with POST having ?_method=DELETE
 app.set('engine view', 'ejs')
 app.engine('ejs', engine)
 
-
 //Home Page
 app.get('/', (req, res) => {
     res.render('home.ejs');
 })
-
-
 
 // All campgrounds
 app.get('/campgrounds', async (req, res) => {
