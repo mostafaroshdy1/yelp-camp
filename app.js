@@ -5,6 +5,9 @@ import { Campground } from '/mnt/internal/coding/Studying/YelpCamp/mine/models/c
 import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
 import methodOverride from 'method-override';
 import engine from 'ejs-mate';
+import { ExpressError } from './utils/ExpressError.mjs'
+import { catchAsync } from './utils/catchAsync.mjs'
+
 
 
 
@@ -25,10 +28,10 @@ app.get('/', (req, res) => {
 })
 
 // All campgrounds
-app.get('/campgrounds', async (req, res) => {
+app.get('/campgrounds', catchAsync(async (req, res) => {
     const campgrounds = await Campground.find()
     res.render('campgrounds/index.ejs', { campgrounds });
-})
+}))
 
 // Add new Campground form
 app.get('/campgrounds/new', (req, res) => {
@@ -36,36 +39,43 @@ app.get('/campgrounds/new', (req, res) => {
 })
 
 // the show page of specific campground
-app.get('/campgrounds/:id', async (req, res) => {
+app.get('/campgrounds/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id)
     res.render('campgrounds/show.ejs', { campground });
-})
-
+}))
 
 //edit page of specific campground form
-app.get('/campgrounds/:id/edit', async (req, res) => {
+app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id)
     res.render('campgrounds/edit.ejs', { campground });
-})
+}))
 
 //Add new campground
-app.post('/campgrounds', async (req, res) => {
-    const campground = await new Campground({ title: req.body.campground.title, location: req.body.campground.location }).save();
+app.post('/campgrounds', catchAsync(async (req, res) => {
+    const campground = new Campground(req.body.campground);
+    await campground.save();
     res.redirect(`/campgrounds/${campground.id}`)
-})
+}))
 
 //edit page of specific campground form
-app.put('/campgrounds/:id', async (req, res) => {
+app.put('/campgrounds/:id', catchAsync(async (req, res) => {
     await Campground.findByIdAndUpdate(req.params.id, { ...req.body.campground }).exec();
     res.redirect(`/campgrounds/${req.params.id}`);
     console.log(req.body)
-})
+}))
 
 app.delete('/campgrounds/:id', async (req, res) => {
     await Campground.findByIdAndDelete(req.params.id);
     res.redirect(`/campgrounds`)
 })
 
+
+
+app.use((err, req, res, next) => {
+    res.send("oh boy, something went wrong")
+})
+
 app.listen(3000, () => {
     console.log('Connected to Port 3000!')
 })
+
