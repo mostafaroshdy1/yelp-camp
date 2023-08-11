@@ -7,8 +7,19 @@ import methodOverride from 'method-override';
 import engine from 'ejs-mate';
 import { ExpressError } from './utils/ExpressError.mjs'
 import { catchAsync } from './utils/catchAsync.mjs'
+import { campgroundSchema } from './schema.mjs'
 
 
+const validateCampground = (req, res, next) => {
+    // campgroundSchema(); //imported from schema.mjs
+    const { error } = campgroundSchema.validate(req.body)
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
 
 
 // Establish the DB connection
@@ -51,28 +62,35 @@ app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
 }))
 
 //Add new campground
-app.post('/campgrounds', catchAsync(async (req, res) => {
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
+    // if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400)
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground.id}`)
 }))
 
 //edit page of specific campground form
-app.put('/campgrounds/:id', catchAsync(async (req, res) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
     await Campground.findByIdAndUpdate(req.params.id, { ...req.body.campground }).exec();
     res.redirect(`/campgrounds/${req.params.id}`);
-    console.log(req.body)
 }))
 
+//deletes campgrounds
 app.delete('/campgrounds/:id', async (req, res) => {
     await Campground.findByIdAndDelete(req.params.id);
     res.redirect(`/campgrounds`)
 })
 
 
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page Not Found', 404))
+})
 
+//Error handling middleware
 app.use((err, req, res, next) => {
-    res.send("oh boy, something went wrong")
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = "Oh No, Something Went Wrong"
+    res.status(statusCode).render('error.ejs', { err })
 })
 
 app.listen(3000, () => {
