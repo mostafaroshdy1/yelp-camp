@@ -85,7 +85,7 @@ app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) =
 
 // Review routes
 //Adding review to campground
-app.post('/campgrounds/:id/reviews', validateReview, async (req, res) => {
+app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id)
     const { body, rating } = req.body.review
     const review = new Review({ body, rating })
@@ -94,14 +94,14 @@ app.post('/campgrounds/:id/reviews', validateReview, async (req, res) => {
     await review.save();
     // res.send(campground.reviews)
     res.redirect(`/campgrounds/${campground.id}`)
-})
+}))
 //Delete Review
-app.delete('/campgrounds/:id/reviews/:xd', async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
-    await Review.findByIdAndDelete(req.params.xd)
-    res.redirect(`/campgrounds/${campground.id}`)
-}
-)
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
+    await Review.findByIdAndDelete(reviewId)
+    res.redirect(`/campgrounds/${id}`)
+}))
 
 
 //edit page of specific campground form
