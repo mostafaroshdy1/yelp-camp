@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { } from 'ejs';
-import { Campground } from '/mnt/internal/coding/Studying/YelpCamp/mine/models/campground.js'
+import { Campground } from '../models/campground.mjs'
 export { seedDB }
 import { cities } from './cities.js'
 import { descriptors, places } from './seedHelpers.js'
