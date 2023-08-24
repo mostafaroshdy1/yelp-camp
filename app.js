@@ -4,7 +4,7 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import { } from 'ejs'; // requied ejs for templating 
 // import { Campground } from './models/campground.mjs' // imports Campground model
-// import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
+import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
 import methodOverride from 'method-override';
 import engine from 'ejs-mate';
 import { ExpressError } from './utils/ExpressError.mjs'
@@ -12,9 +12,14 @@ import { ExpressError } from './utils/ExpressError.mjs'
 // import { campgroundSchema } from './schema.mjs'
 // import { reviewSchema } from './schema.mjs'
 // import { Review } from './models/review.mjs'
-import { router as campgrounds } from './routes/campground.mjs';
-import { router as reviews } from './routes/reviews.mjs'
+import { router as campgroundRoutes } from './routes/campground.mjs';
+import { router as reviewRoutes } from './routes/reviews.mjs'
+import passport from 'passport';
+import LocalStrategy from 'passport-local';
+import { User } from './models/user.mjs'
+import { router as userRoutes } from './routes/users.mjs'
 
+// seedDB(); // for seeding the DB
 
 // Establish the DB connection
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
@@ -24,7 +29,7 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(methodOverride('_method'))// override with POST having ?_method=DELETE
 // sets the view engine to ejs
-app.use(express.static('public'))
+app.use(express.static('public'));
 
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret!',
@@ -37,6 +42,15 @@ const sessionConfig = {
     }
 }
 app.use(session(sessionConfig))
+
+//Passport
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()))
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
 app.use(flash());
 app.set('engine view', 'ejs')
 app.engine('ejs', engine)
@@ -47,20 +61,27 @@ app.get('/', (req, res) => {
 })
 
 app.use((req, res, next) => {
+
+    res.locals.currentUser = req.user; // to have the req.user on every template
     res.locals.success = req.flash('success')
     res.locals.error = req.flash('error')
     next();
 })
 
-// All campgrounds
-app.use('/campgrounds', campgrounds)
-
-// Review routes
-app.use('/campgrounds/:id/reviews', reviews)
 
 
+//  All campgrounds
+app.use('/campgrounds', campgroundRoutes)
+
+//  Review routes
+app.use('/campgrounds/:id/reviews', reviewRoutes)
+
+//  Register route
+app.use('/', userRoutes)
 
 
+
+//  Any Invalid routes
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404))
 })
