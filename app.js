@@ -20,6 +20,7 @@ import LocalStrategy from 'passport-local';
 import { User } from './models/user.mjs'
 import { router as userRoutes } from './routes/users.mjs'
 
+
 // seedDB(); // for seeding the DB
 
 // Establish the DB connection
@@ -31,6 +32,7 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 app.use(methodOverride('_method'))// override with POST having ?_method=DELETE
 // sets the view engine to ejs
 app.use(express.static('public'));
+
 
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret!',
