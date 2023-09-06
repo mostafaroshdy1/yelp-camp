@@ -11,7 +11,7 @@ const ImageSchema = new Schema(
     })
 
 ImageSchema.virtual('thumbnail').get(function () {
-    return this.url.replace('/upload', '/upload/w_300')
+    return this.url.replace('/upload', '/upload/w_200');
 });
 
 const opts = { toJSON: { virtuals: true } };
@@ -21,8 +21,8 @@ const CampgroundSchema = new Schema({
     images: [ImageSchema],
     geometry: {
         type: {
-            type: String, // Don't do `{ location: { type: String } }`
-            enum: ['Point'], // 'location.type' must be 'Point'
+            type: String,
+            enum: ['Point'],
             required: true
         },
         coordinates: {

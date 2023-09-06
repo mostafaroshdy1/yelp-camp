@@ -11,7 +11,7 @@ const sample = array => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async () => {
     await Campground.deleteMany({})
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 400; i++) {
         const random1000 = Math.floor(Math.random() * 1000)
         const price = Math.floor(Math.random() * 20) + 10
         await new Campground({
@@ -29,12 +29,12 @@ const seedDB = async () => {
             },
             images: [
                 {
-                    url: "https://cdn.pixabay.com/photo/2023/08/01/12/46/mountain-8162918_960_720.jpg",
+                    url: "https://res.cloudinary.com/dlmq1xbtj/image/upload/v1693995862/YelpCamp/tree-736885_960_720_bflg1q.jpg",
                     filename: "YelpCamp/umfkfylxqq5qcvewja89",
 
                 },
                 {
-                    url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_960_720.jpg",
+                    url: "https://res.cloudinary.com/dlmq1xbtj/image/upload/v1693995838/YelpCamp/mountain-8162918_960_720_xetcta.jpg",
                     filename: "YelpCamp/owosqro8vjddavfvnbcz",
 
                 }

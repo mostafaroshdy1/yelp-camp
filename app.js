@@ -3,11 +3,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import session from 'express-session';
 import flash from 'connect-flash';
-import { } from 'ejs'; // requied ejs for templating 
+// import { } from 'ejs'; // requied ejs for templating 
 // import { Campground } from './models/campground.mjs' // imports Campground model
 import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
 import methodOverride from 'method-override';
-import engine from 'ejs-mate';
+import ejsMate from 'ejs-mate';
 import { ExpressError } from './utils/ExpressError.mjs'
 // import { catchAsync } from './utils/catchAsync.mjs'
 // import { campgroundSchema } from './schema.mjs'
@@ -55,13 +55,10 @@ passport.deserializeUser(User.deserializeUser());
 
 
 app.use(flash());
-app.set('engine view', 'ejs')
-app.engine('ejs', engine)
-
+app.engine('ejs', ejsMate)
+app.set('view engine', 'ejs');
 //Home Page
-app.get('/', (req, res) => {
-    res.render('home.ejs');
-})
+
 
 app.use((req, res, next) => {
 
@@ -70,8 +67,12 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error')
     next();
 })
+app.get('/', (req, res) => {
+    res.render('home.ejs');
+})
 
-
+//  Register route
+app.use('/', userRoutes)
 
 //  All campgrounds
 app.use('/campgrounds', campgroundRoutes)
@@ -79,8 +80,6 @@ app.use('/campgrounds', campgroundRoutes)
 //  Review routes
 app.use('/campgrounds/:id/reviews', reviewRoutes)
 
-//  Register route
-app.use('/', userRoutes)
 
 
 
