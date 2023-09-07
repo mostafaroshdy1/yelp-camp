@@ -1,8 +1,11 @@
+process.env.NODE_ENV = "development"
 import 'dotenv/config'
 import express from 'express';
 import mongoose from 'mongoose';
 import session from 'express-session';
 import flash from 'connect-flash';
+import mongoSanitize from 'express-mongo-sanitize';
+import helmet from "helmet";
 // import { } from 'ejs'; // requied ejs for templating 
 // import { Campground } from './models/campground.mjs' // imports Campground model
 import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
@@ -21,6 +24,7 @@ import { User } from './models/user.mjs'
 import { router as userRoutes } from './routes/users.mjs'
 
 
+
 // seedDB(); // for seeding the DB
 
 // Establish the DB connection
@@ -32,14 +36,17 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 app.use(methodOverride('_method'))// override with POST having ?_method=DELETE
 // sets the view engine to ejs
 app.use(express.static('public'));
+app.use(mongoSanitize());
 
 
 const sessionConfig = {
+    name: 'session',
     secret: 'thisshouldbeabettersecret!',
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        // secure:true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7,
     }
@@ -53,6 +60,53 @@ passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.use(helmet());
+
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://api.mapbox.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.mapbox.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+];
+const connectSrcUrls = [
+    "https://api.mapbox.com/",
+    "https://a.tiles.mapbox.com/",
+    "https://b.tiles.mapbox.com/",
+    "https://events.mapbox.com/",
+
+];
+const fontSrcUrls = [];
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/dlmq1xbtj/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://images.unsplash.com/",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
 
 app.use(flash());
 app.engine('ejs', ejsMate)
@@ -61,7 +115,6 @@ app.set('view engine', 'ejs');
 
 
 app.use((req, res, next) => {
-
     res.locals.currentUser = req.user; // to have the req.user on every template
     res.locals.success = req.flash('success')
     res.locals.error = req.flash('error')
