@@ -6,6 +6,10 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import mongoSanitize from 'express-mongo-sanitize';
 import helmet from "helmet";
+import cookieParser from 'cookie-parser';
+
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+
 // import { } from 'ejs'; // requied ejs for templating 
 // import { Campground } from './models/campground.mjs' // imports Campground model
 import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
@@ -51,62 +55,85 @@ const sessionConfig = {
         maxAge: 1000 * 60 * 60 * 24 * 7,
     }
 }
-app.use(session(sessionConfig))
 
 //Passport
+app.use(cookieParser())
+app.use(session(sessionConfig))
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()))
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 
-app.use(helmet());
+passport.serializeUser(function (user, done) { done(null, user) });
+passport.deserializeUser(function (user, done) { done(null, user) });
 
 
-const scriptSrcUrls = [
-    "https://stackpath.bootstrapcdn.com/",
-    "https://api.tiles.mapbox.com/",
-    "https://api.mapbox.com/",
-    "https://kit.fontawesome.com/",
-    "https://cdnjs.cloudflare.com/",
-    "https://cdn.jsdelivr.net",
-];
-const styleSrcUrls = [
-    "https://kit-free.fontawesome.com/",
-    "https://stackpath.bootstrapcdn.com/",
-    "https://api.mapbox.com/",
-    "https://api.tiles.mapbox.com/",
-    "https://fonts.googleapis.com/",
-    "https://use.fontawesome.com/",
-];
-const connectSrcUrls = [
-    "https://api.mapbox.com/",
-    "https://a.tiles.mapbox.com/",
-    "https://b.tiles.mapbox.com/",
-    "https://events.mapbox.com/",
+//Passport-google auth
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: "http://roshdy.tplinkdns.com/auth/google/callback"
+},
+    function (accessToken, refreshToken, profile, cb) {
+        User.findOrCreate({ googleId: profile.id, username: profile.displayName, email: profile.emails[0].value }, function (err, user) {
+            return cb(err, user);
+        });
+    }
+));
 
-];
-const fontSrcUrls = [];
-app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: [],
-            connectSrc: ["'self'", ...connectSrcUrls],
-            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-            workerSrc: ["'self'", "blob:"],
-            objectSrc: [],
-            imgSrc: [
-                "'self'",
-                "blob:",
-                "data:",
-                "https://res.cloudinary.com/dlmq1xbtj/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
-                "https://images.unsplash.com/",
-            ],
-            fontSrc: ["'self'", ...fontSrcUrls],
-        },
-    })
-);
+
+
+
+// app.use(helmet());
+
+
+// const scriptSrcUrls = [
+//     "https://stackpath.bootstrapcdn.com/",
+//     "https://api.tiles.mapbox.com/",
+//     "https://api.mapbox.com/",
+//     "https://kit.fontawesome.com/",
+//     "https://cdnjs.cloudflare.com/",
+//     "https://cdn.jsdelivr.net",
+
+// ];
+// const styleSrcUrls = [
+//     "https://kit-free.fontawesome.com/",
+//     "https://stackpath.bootstrapcdn.com/",
+//     "https://api.mapbox.com/",
+//     "https://api.tiles.mapbox.com/",
+//     "https://fonts.googleapis.com/",
+//     "https://use.fontawesome.com/",
+//     "https://fonts.googleapis.com/",
+// ];
+// const connectSrcUrls = [
+//     "https://api.mapbox.com/",
+//     "https://a.tiles.mapbox.com/",
+//     "https://b.tiles.mapbox.com/",
+//     "https://events.mapbox.com/",
+
+
+// ];
+// const fontSrcUrls = [];
+// app.use(
+//     helmet.contentSecurityPolicy({
+//         directives: {
+//             defaultSrc: [],
+//             connectSrc: ["'self'", ...connectSrcUrls],
+//             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+//             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+//             workerSrc: ["'self'", "blob:"],
+//             objectSrc: [],
+//             imgSrc: [
+//                 "'self'",
+//                 "blob:",
+//                 "data:",
+//                 "https://res.cloudinary.com/dlmq1xbtj/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+//                 "https://images.unsplash.com/",
+//                 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
+//             ],
+//             fontSrc: ["'self'", ...fontSrcUrls],
+//         },
+//     })
+// );
 
 app.use(flash());
 app.engine('ejs', ejsMate)

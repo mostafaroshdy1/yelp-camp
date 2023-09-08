@@ -18,4 +18,11 @@ router.route('/login')
     .post(storeReturnTo, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), users.login)
 
 
-router.get('/logout', users.logout); 
+router.get('/logout', users.logout);
+
+
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+router.get('/auth/google/callback', storeReturnTo,
+    passport.authenticate('google', { failureRedirect: '/login' }), users.login);
