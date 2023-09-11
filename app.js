@@ -13,7 +13,6 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 // import { } from 'ejs'; // requied ejs for templating 
 // import { Campground } from './models/campground.mjs' // imports Campground model
-import { seedDB } from '/mnt/internal/coding/Studying/YelpCamp/mine/seeds/index.js' // To seed our data base (deletes current DB)
 import methodOverride from 'method-override';
 import ejsMate from 'ejs-mate';
 import { ExpressError } from './utils/ExpressError.mjs'
@@ -30,7 +29,6 @@ import { router as userRoutes } from './routes/users.mjs'
 
 const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp'
 
-// seedDB(); // for seeding the DB
 
 // Establish the DB connection
 mongoose.connect(dbUrl)
