@@ -127,7 +127,7 @@ const fontSrcUrls = [];
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            formAction: ['self', 'https://yelpcampoo.onrender.com'],
+            formAction: ['self', 'https://yelpcampoo.onrender.com/auth/google'],
             defaultSrc: [],
             connectSrc: ["'self'", ...connectSrcUrls],
             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
