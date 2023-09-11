@@ -30,7 +30,7 @@ import { router as userRoutes } from './routes/users.mjs'
 
 const dbUrl = process.env.DB_URL || 'mongodb://127.0.0.1:27017/yelp-camp'
 
-seedDB(); // for seeding the DB
+// seedDB(); // for seeding the DB
 
 // Establish the DB connection
 mongoose.connect(dbUrl)
