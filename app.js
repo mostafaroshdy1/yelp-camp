@@ -120,6 +120,7 @@ const connectSrcUrls = [
     "https://a.tiles.mapbox.com/",
     "https://b.tiles.mapbox.com/",
     "https://events.mapbox.com/",
+    "https://yelpcampoo.onrender.com",
 
 
 ];
