@@ -120,7 +120,6 @@ const connectSrcUrls = [
     "https://a.tiles.mapbox.com/",
     "https://b.tiles.mapbox.com/",
     "https://events.mapbox.com/",
-    "https://yelpcampoo.onrender.com",
 
 
 ];
@@ -128,7 +127,7 @@ const fontSrcUrls = [];
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            formAction: 'self',
+            formAction: ['self', 'https://yelpcampoo.onrender.com'],
             defaultSrc: [],
             connectSrc: ["'self'", ...connectSrcUrls],
             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
