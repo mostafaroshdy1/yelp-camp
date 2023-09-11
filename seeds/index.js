@@ -4,8 +4,8 @@ import { Campground } from '../models/campground.mjs'
 export { seedDB }
 import { cities } from './cities.js'
 import { descriptors, places } from './seedHelpers.js'
-mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
-    .then(console.log('dataBase Connected'));
+// mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
+//     .then(console.log('dataBase Connected'));
 
 const sample = array => array[Math.floor(Math.random() * array.length)];
 
