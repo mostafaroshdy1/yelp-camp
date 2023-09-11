@@ -1,17 +1,13 @@
-import mongoose from 'mongoose';
-import { } from 'ejs';
+
 import { Campground } from '../models/campground.mjs'
 export { seedDB }
 import { cities } from './cities.js'
 import { descriptors, places } from './seedHelpers.js'
-// mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
-//     .then(console.log('dataBase Connected'));
-
 const sample = array => array[Math.floor(Math.random() * array.length)];
 
 const seedDB = async () => {
     await Campground.deleteMany({})
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < 10; i++) {
         const random1000 = Math.floor(Math.random() * 1000)
         const price = Math.floor(Math.random() * 20) + 10
         await new Campground({
