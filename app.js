@@ -46,7 +46,7 @@ const store = MongoStore.create({
     mongoUrl: dbUrl,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: 'thisshouldbeabettersecret!'
+        secret: process.env.SEESSION_PASSWORD
     }
 });
 store.on('error', function (e) {
@@ -56,7 +56,7 @@ store.on('error', function (e) {
 const sessionConfig = {
     store,
     name: 'session',
-    secret: 'thisshouldbeabettersecret!',
+    secret: process.env.SEESSION_PASSWORD,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -82,7 +82,7 @@ passport.deserializeUser(function (user, done) { done(null, user) });
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://roshdy.tplinkdns.com/auth/google/callback"
+    callbackURL: "https://yelpcampoo.onrender.com/auth/google/callback"
 },
     function (accessToken, refreshToken, profile, cb) {
         User.findOrCreate({ googleId: profile.id, username: profile.displayName, email: profile.emails[0].value }, function (err, user) {
