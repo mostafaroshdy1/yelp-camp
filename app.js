@@ -114,6 +114,7 @@ const styleSrcUrls = [
     "https://fonts.googleapis.com/",
     "https://use.fontawesome.com/",
     "https://fonts.googleapis.com/",
+    "https://upload.wikimedia.org",
 ];
 const connectSrcUrls = [
     "https://api.mapbox.com/",
