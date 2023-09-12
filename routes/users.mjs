@@ -21,7 +21,7 @@ router.route('/login')
 router.get('/logout', users.logout);
 
 
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 
 router.get('/auth/google/callback', storeReturnTo,
