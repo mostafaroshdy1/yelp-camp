@@ -127,7 +127,6 @@ const fontSrcUrls = [];
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            formAction: 'self',
             defaultSrc: [],
             connectSrc: ["'self'", ...connectSrcUrls],
             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
